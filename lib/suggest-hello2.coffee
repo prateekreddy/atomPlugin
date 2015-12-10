@@ -36,7 +36,7 @@ module.exports =
                   type = "id"
                   oneSelector = oneSelector.substring(1,oneSelector.length)
                 else
-                  type = "tag"
+                  type = "tag" 
                 classList.push({"name": oneSelector, "type": type})
     console.log classList
 
