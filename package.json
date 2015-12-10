@@ -1,0 +1,26 @@
+{
+  "name": "suggest-hello2",
+  "main": "./lib/suggest-hello2",
+  "version": "0.0.1",
+  "description": "Suggest hello for anything and everything",
+  "keywords": [
+  ],
+  "activationCommands": {
+    "atom-workspace": "suggest-hello2:toggle"
+  },
+  "repository": "https://github.com/prateekreddy/atomPlugin.git",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0":"getProvider"
+      }
+    }
+  },
+  "dependencies": {
+      "css" : "2.2.1"
+  }
+}
