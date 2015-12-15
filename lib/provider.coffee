@@ -55,16 +55,19 @@ module.exports =
                     # console.log classList.indexOf oneSelector
                     if classList.indexOf oneSelector ==-1
                       classList = classList.concat oneSelector.split(' ')
+          class trie
+            head : {}
+            insertIntoTrie : (word) ->
+              temp = @head
+              for letter in word
+                temp[letter] = {} unless temp[letter]?
+                temp = temp[letter]
+              temp["word"] = word
 
-          op = (data) ->
-            data =
-              text : data.substring(1,data.length)
-              type : "class"
-            # console.log data.text.indexOf(prefix)
-            if data.text.indexOf(prefix) == 0
-              list.push(data)
+          sugg = new trie()
+          sugg.insertIntoTrie(classes) for classes in classList
 
-          op(data) for data in classList
+          list = sugg.search prefix
           # console.log list
 
           resolve list
