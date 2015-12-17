@@ -1,4 +1,10 @@
 provider = require './provider'
+path = require 'path'
+
+atom.workspace.observeTextEditors (editor) ->
+  if path.extname(editor.getPath()) == ".html"
+    provider.makeWordList(editor)                   #implement destroying the wordlist on closing the editor
+
 
 module.exports =
   getProvider: ->
