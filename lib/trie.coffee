@@ -1,6 +1,8 @@
-array = ["hi", "how", "hello", "here"]
+# array = ["hi", "how", "hello", "here", "he", "hello node"]
 
-class trie
+module.exports =
+class wordBank
+
   head : {}
   insertWord : (word) ->
     temp = @head
@@ -10,7 +12,7 @@ class trie
     temp["word"] = word
 
   insertWords : (words) ->
-    sugg.insertWord(word) for word in words
+    @insertWord(word) for word in words
 
   search : (word, nodeSearch) ->
     temp = @head
@@ -35,32 +37,25 @@ class trie
     for child in Object.keys(node)
       # console.log child
       if node[child].word?
-        # console.log node[child].word
-
-        console.log "first"
-        console.log child
         words.push node[child].word
         delete node[child].word
-      else if child == "word"
-        console.log "second"
-        console.log child
-        words.push node[child]
-      if !node[child].word? && child!= "word"
-        # console.log node[child]
-        console.log "third"
-        console.log child
-        words = words.concat @DFS node[child]
+      else
+        words.push node[child] if child is "word"
+      words = words.concat @DFS node[child] unless node[child].word? or child is "word"
     words
 
   wordsWithPrefix : (prefix) ->
+    prefix = prefix.trim()
+    # console.log prefix
     prefixNode = @search(prefix, true)
-    @DFS prefixNode
+    # console.log prefixNode
+    @DFS prefixNode if prefixNode?
 
-sugg = new trie()
-sugg.insertWord "hello"
-sugg.insertWord "here"
-sugg.insertWord "hi"
-sugg.insertWord "he"
-# console.log (JSON.stringify sugg.head, null, 4)
-
-console.log (JSON.stringify (sugg.wordsWithPrefix "he"), null, 4)
+# sugg = new trie()
+# sugg.insertWords array
+# # sugg.insertWord "here"
+# # sugg.insertWord "hi"
+# # sugg.insertWord "he"
+# # console.log (JSON.stringify sugg.head, null, 4)
+#
+# console.log (JSON.stringify (sugg.wordsWithPrefix "hello"), null, 4)

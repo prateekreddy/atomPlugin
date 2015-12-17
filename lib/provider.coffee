@@ -1,5 +1,6 @@
 css = require 'css'
 fs = require 'fs'
+wordBank = require './trie'
 
 module.exports =
   selector: '.text.html .string'
@@ -10,13 +11,13 @@ module.exports =
   # i.e. The default provider will be suppressed
   inclusionPriority: 5
   excludeLowerPriority: true
-
+  
   # Required: Return a promise, an array of suggestions, or null.
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix, activatedManually}) ->
     new Promise (resolve) ->
       # console.log "working"
       testero = (obj) ->
-        console.log obj.range.end
+        # console.log obj.range.end
         if obj.range.end.column is bufferPosition.column
           cssFiles = []
           classList = []
@@ -55,22 +56,25 @@ module.exports =
                     # console.log classList.indexOf oneSelector
                     if classList.indexOf oneSelector ==-1
                       classList = classList.concat oneSelector.split(' ')
-          class trie
-            head : {}
-            insertIntoTrie : (word) ->
-              temp = @head
-              for letter in word
-                temp[letter] = {} unless temp[letter]?
-                temp = temp[letter]
-              temp["word"] = word
+          # class trie
+          #   head : {}
+          #   insertIntoTrie : (word) ->
+          #     temp = @head
+          #     for letter in word
+          #       temp[letter] = {} unless temp[letter]?
+          #       temp = temp[letter]
+          #     temp["word"] = word
 
-          sugg = new trie()
-          sugg.insertIntoTrie(classes) for classes in classList
+          sugg = new wordBank()
+          # console.log classList
+          sugg.insertWords classList
 
-          list = sugg.search prefix
-          # console.log list
-
-          resolve list
+          list = sugg.wordsWithPrefix "."+prefix
+          # console.log list?
+          suggestions = []
+          suggestions.push({"text": eachWord?.substring(1,eachWord?.length), "type": "class"}) for eachWord in list if list?
+          # console.log suggestions
+          resolve suggestions
       # console.log bufferPosition.row
       editor.buffer.backwardsScanInRange(/\bclass\s?=\s?(?:"|')[a-z][\w-:]*/i, [[0,0], [bufferPosition.row,bufferPosition.column]], testero)
 
