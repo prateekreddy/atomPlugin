@@ -15,33 +15,39 @@ module.exports =
     wordList[filePath] = {}
     wordList[filePath].cssFiles = []
     wordList[filePath].listArray = []
+    currentPath = filePath.substring 0,filePath.lastIndexOf("\\")+1
     editor.scan(/stylesheet/g, (object) ->
       line = object.lineText
-      link = line.match(/[\w._/]+\.css/)
-      wordList[filePath].cssFiles.push(link)
+      link = line.match(/[\w._/]+\.css/)[0]
+      wordList[filePath].cssFiles.push(currentPath+link)
       )
-    currentPath = filePath.substring 0,filePath.lastIndexOf("\\")+1
     for file in wordList[filePath].cssFiles when wordList[filePath].cssFiles?
-      cssText = fs.readFileSync currentPath + file.toString(), 'utf8'
+      try
+        cssText = fs.readFileSync file, 'utf8'
+      catch err
+        console.log err
+        continue
       cssParseObj = css.parse cssText
-      for oneRule in cssParseObj.stylesheet.rules when cssParseObj.type is "stylesheet"
-        for oneSelector in oneRule.selectors when oneRule.type is "rule"
-          wordList[filePath].listArray = wordList[filePath].listArray.concat oneSelector.split(' ') if wordList[filePath].listArray.indexOf(oneSelector) is -1
+      # console.log cssParseObj
+      for oneRule in cssParseObj.stylesheet.rules when cssParseObj.type is "stylesheet" and oneRule.type is "rule"
+        for oneSelector in oneRule.selectors when wordList[filePath].listArray.indexOf(oneSelector) is -1
+          wordList[filePath].listArray = wordList[filePath].listArray.concat oneSelector.split(' ')
     wordList[filePath].listArray
-    # console.log wordList
+    console.log "list made"
 
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix, activatedManually}) ->
     new Promise (resolve) ->
-      testero = (obj) ->
+      editor.buffer.backwardsScanInRange(/\bclass\s?=\s?(?:"|')[a-z][\w-:]*/i, [[0,0], [bufferPosition.row,bufferPosition.column]], (obj) ->
         if obj.range.end.column is bufferPosition.column
           list = []
           sugg = new wordBank()
           sugg.insertWords wordList[editor.getPath()].listArray
           list = sugg.wordsWithPrefix "."+prefix
           suggestions = []
-          suggestions.push({"text": eachWord?.substring(1,eachWord?.length), "type": "class"}) for eachWord in list when list?
+          suggestions.push({"text": eachWord?.substring(1,list[0]?.length), "type": "class"}) for eachWord in list if list?
+          console.log "suggesting"
           resolve suggestions
-      editor.buffer.backwardsScanInRange(/\bclass\s?=\s?(?:"|')[a-z][\w-:]*/i, [[0,0], [bufferPosition.row,bufferPosition.column]], testero)
+        )
 
 
   # (optional): called _after_ the suggestion `replacementPrefix` is replaced
