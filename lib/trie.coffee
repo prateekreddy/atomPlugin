@@ -1,6 +1,6 @@
 module.exports =
-class wordBank
 
+class SuggestionTree
   head : {}
   insertWord : (word) ->
     temp = @head

@@ -1,6 +1,6 @@
 css = require 'css'
 fs = require 'fs'
-wordBank = require './trie'
+SuggestionTree = require './trie'
 wordList = {}
 
 module.exports =
@@ -15,6 +15,7 @@ module.exports =
     wordList[filePath] = {}
     wordList[filePath].cssFiles = []
     wordList[filePath].listArray = []
+    wordList[filePath].suggTrie = new SuggestionTree()
     currentPath = filePath.substring 0,filePath.lastIndexOf("\\")+1
     editor.scan(/stylesheet/g, (object) ->
       line = object.lineText
@@ -33,22 +34,24 @@ module.exports =
         for oneSelector in oneRule.selectors when wordList[filePath].listArray.indexOf(oneSelector) is -1
           wordList[filePath].listArray = wordList[filePath].listArray.concat oneSelector.split(' ')
     wordList[filePath].listArray
-    console.log "list made"
 
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix, activatedManually}) ->
     new Promise (resolve) ->
-      editor.buffer.backwardsScanInRange(/\bclass\s?=\s?(?:"|')[a-z][\w-:]*/i, [[0,0], [bufferPosition.row,bufferPosition.column]], (obj) ->
-        if obj.range.end.column is bufferPosition.column
-          list = []
-          sugg = new wordBank()
-          sugg.insertWords wordList[editor.getPath()].listArray
-          list = sugg.wordsWithPrefix "."+prefix
-          suggestions = []
-          suggestions.push({"text": eachWord?.substring(1,list[0]?.length), "type": "class"}) for eachWord in list if list?
-          console.log "suggesting"
-          resolve suggestions
-        )
+      if prefix == ""
+        resolve []
+      else
+        editor.buffer.backwardsScanInRange(/\bclass\s?=\s?(?:"|')[a-z][\w-:]*/i, [[0,0], [bufferPosition.row,bufferPosition.column]], (obj) ->
+          if obj.range.end.column is bufferPosition.column
+            list = []
+            sugg = wordList[editor.getPath()].suggTrie
+            sugg.insertWords wordList[editor.getPath()].listArray
+            list = sugg.wordsWithPrefix "."+prefix
+            suggestions = []
+            suggestions.push({"text": eachWord?.substring(1,list[0]?.length), "type": "class"}) for eachWord in list if list?
+            resolve suggestions
+          )
 
   onDidInsertSuggestion: ({editor, triggerPosition, suggestion}) ->
 
   dispose: ->
+    console.log "Plugin disabled"
