@@ -49,11 +49,6 @@ module.exports =
           resolve suggestions
         )
 
-
-  # (optional): called _after_ the suggestion `replacementPrefix` is replaced
-  # by the suggestion `text` in the buffer
   onDidInsertSuggestion: ({editor, triggerPosition, suggestion}) ->
 
-  # (optional): called when your provider needs to be cleaned up. Unsubscribe
-  # from things, kill any processes, etc.
   dispose: ->

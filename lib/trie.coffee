@@ -1,5 +1,3 @@
-# array = ["hi", "how", "hello", "here", "he", "hello node"]
-
 module.exports =
 class wordBank
 
@@ -20,9 +18,7 @@ class wordBank
     for letter in word
       count++;
       if temp[letter]?
-        # console.log letter
         temp = temp[letter]
-        # console.log  temp
         if nodeSearch
           flag = (count == word.length)
         else
@@ -35,7 +31,6 @@ class wordBank
   DFS : (node) ->
     words=[]
     for child in Object.keys(node)
-      # console.log child
       if node[child].word?
         words.push node[child].word
         delete node[child].word
@@ -46,16 +41,5 @@ class wordBank
 
   wordsWithPrefix : (prefix) ->
     prefix = prefix.trim()
-    # console.log prefix
     prefixNode = @search(prefix, true)
-    # console.log prefixNode
     @DFS prefixNode if prefixNode?
-
-# sugg = new trie()
-# sugg.insertWords array
-# # sugg.insertWord "here"
-# # sugg.insertWord "hi"
-# # sugg.insertWord "he"
-# # console.log (JSON.stringify sugg.head, null, 4)
-#
-# console.log (JSON.stringify (sugg.wordsWithPrefix "hello"), null, 4)
