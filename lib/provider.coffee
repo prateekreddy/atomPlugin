@@ -50,8 +50,3 @@ module.exports =
             suggestions.push({"text": eachWord?.substring(1,list[0]?.length), "type": "class"}) for eachWord in list if list?
             resolve suggestions
           )
-
-  onDidInsertSuggestion: ({editor, triggerPosition, suggestion}) ->
-
-  dispose: ->
-    console.log "Plugin disabled"
